@@ -54,7 +54,16 @@ centernodeid = 0
 def new_node(nodeid, x, y):
 	col = x // config['grid_tile_width']
 	row = y // config['grid_tile_height']
-	network_graph.add_node(nodeid, x=x, y=y, row=row, col=col, id=nodeid, color=config['node_color'], size=config['node_size'], label=nodeid)
+
+	color = config['node_color']
+
+	if nodeid in config['score_nodes']:
+		color = config['score_node_color']
+
+	if nodeid == 0:
+		color = config['origin_node_color']
+
+	network_graph.add_node(nodeid, x=x, y=y, row=row, col=col, id=nodeid, color=color, size=config['node_size'], label=nodeid)
 
 def new_edge(nodeid1, nodeid2):
 	tiles = edge_tiles(nodeid1, nodeid2)
@@ -489,9 +498,10 @@ def calculate_score():
 	global time
 	global scoremax
 
-	for value in nx.single_source_dijkstra_path_length(timestep_graph, centernodeid).values():
-		if not value == 0:
-			data[time]['score'] += 1 / value
+	for key, value in nx.single_source_dijkstra_path_length(timestep_graph, centernodeid).items():
+		if len(config['score_nodes']) == 0 or key in config['score_nodes']:
+			if not value == 0:
+				data[time]['score'] += 1 / value
 
 	scoremax = max(scoremax, data[time]['score'])
 
@@ -634,6 +644,8 @@ def configure_args():
 	parser.add_argument("-W", "--web", metavar=('RADIALS','RINGS'), type=int, nargs=2, help="web RADIALS RINGS")
 	parser.add_argument("-R", "--random", metavar=('NODES','EDGES'), type=int, nargs=2, help="random NODES EDGES")
 	parser.add_argument("-NC", "--node-color", nargs=1, help="node color", default='blue')
+	parser.add_argument("-SNC", "--score-node-color", nargs=1, help="score node color", default='green')
+	parser.add_argument("-ONC", "--origin-node-color", nargs=1, help="origin node color", default='red')
 	parser.add_argument("-NS", "--node-size", nargs=1, type=int, help="node size", default=30)
 	parser.add_argument("-EC", "--edge-color", nargs=1, help="edge color", default='blue')
 	parser.add_argument("-EW", "--edge-width", nargs=1, type=int, help="edge width", default=1.5)
@@ -668,6 +680,7 @@ def configure_args():
 	parser.add_argument("-CLX", "--chart-label-x", nargs=1, help="chart label x LABEL", default='Events per timestep')
 	parser.add_argument("-CLY", "--chart-label-y", nargs=1, help="chart label y LABEL", default='Network efficiency')
 	parser.add_argument("-CT", "--chart-title", nargs=1, help="chart title TITLE", default='Network efficiency vs Events per timestep')
+	parser.add_argument("-SN", "--score-nodes", nargs=1, help="score nodes NODES", default='')
 
 	args = parser.parse_args()
 
@@ -675,6 +688,7 @@ def configure_args():
 
 	config['grid_tile_height'] 	= config['map_height'] // config['grid_rows']
 	config['grid_tile_width'] 	= config['map_width'] // config['grid_cols']
+	config['score_nodes'] 		= list(map(int, config['score_nodes'][0].split(',')))
 
 def output_csv():
 	global output_directory
