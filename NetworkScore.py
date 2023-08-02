@@ -274,13 +274,14 @@ def delete_edges_at_tile(row, col):
 #		debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
 #		timestep_graph.remove_edge(nodeid1, nodeid2)
 
-#	delete random edge
-	edgenode = random.choice(edges_to_delete)
-	nodeid1 = edgenode[0]
-	nodeid2 = edgenode[1]
+	if len(edges_to_delete) > 0:
+		# delete random edge
+		edgenode = random.choice(edges_to_delete)
+		nodeid1 = edgenode[0]
+		nodeid2 = edgenode[1]
 
-	debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
-	timestep_graph.remove_edge(nodeid1, nodeid2)
+		debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
+		timestep_graph.remove_edge(nodeid1, nodeid2)
 
 
 def delete_node_at_tile(row, col):
