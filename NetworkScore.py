@@ -267,12 +267,20 @@ def delete_edges_at_tile(row, col):
 				edges_to_delete.append([nodeid1, nodeid2])
 				break
 
-	for edgenodes in edges_to_delete:
-		nodeid1 = edgenodes[0]		
-		nodeid2 = edgenodes[1]		
+#	for edgenodes in edges_to_delete:
+#		nodeid1 = edgenodes[0]		
+#		nodeid2 = edgenodes[1]		
+#
+#		debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
+#		timestep_graph.remove_edge(nodeid1, nodeid2)
 
-		debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
-		timestep_graph.remove_edge(nodeid1, nodeid2)
+#	delete random edge
+	edgenode = random.choice(edges_to_delete)
+	nodeid1 = edgenode[0]
+	nodeid2 = edgenode[1]
+
+	debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
+	timestep_graph.remove_edge(nodeid1, nodeid2)
 
 
 def delete_node_at_tile(row, col):
@@ -551,7 +559,7 @@ def process_events_netcdf():
 					timestepevents += 1
 #					delete_node_at_tile(rowrand, colrand)
 #					place_image_at_tile(rowrand, colrand)
-					delete_node_at_tile(row, col)
+#					delete_node_at_tile(row, col)
 					delete_edges_at_tile(row, col)
 					place_image_at_tile(row, col)
 
