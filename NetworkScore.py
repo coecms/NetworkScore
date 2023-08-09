@@ -535,7 +535,7 @@ def process_events_netcdf():
 		exit()
 
 	ds = xr.open_dataset(netcdf_filename, engine = "netcdf4")
-	for time, timevariable in enumerate(ds.variables['events']):
+	for time, timevariable in enumerate(ds.events):
 		if config['max_generations'] is not None and time >= config['max_generations'][0]:
 			break
 
@@ -552,17 +552,12 @@ def process_events_netcdf():
 			clear_plot()
 			prepare_plot()
 
-		for row, lat in enumerate(timevariable):
-#			rowrand = row * 10 + random.randint(0, 9)
-			for col, lon in enumerate(lat):
-				if (lon.values == 1.0):
-#					colrand = col * 10 + random.randint(0, 9)
-					timestepevents += 1
-#					delete_node_at_tile(rowrand, colrand)
-#					place_image_at_tile(rowrand, colrand)
-#					delete_node_at_tile(row, col)
-					delete_edges_at_tile(row, col)
-					place_image_at_tile(row, col)
+		lat, lon = np.where(timevariable != 0)
+		for row, col in zip(lat, lon):
+			timestepevents += 1
+			#delete_node_at_tile(row.item(), col.item())
+			delete_edges_at_tile(row.item(), col.item())
+			place_image_at_tile(row.item(), col.item())
 
 		data[time] = {'time': time, 'timestepevents': timestepevents, 'score': 0}
 

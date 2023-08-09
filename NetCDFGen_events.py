@@ -2,16 +2,16 @@ import netCDF4 as nc
 import random
 import numpy as np
 
-fn = 'Event_severity.nc'
+fn = 'Event_severity_freq.nc'
 ds = nc.Dataset(fn, 'w', format='NETCDF4')
 
 # Number of Timesteps:
-Number_Of_Ticks = 10000
+Number_Of_Ticks = 3000
 # Event severity:
 event_lev = [1, 3, 5]
 # Weights for each Event severity level:
 # 1 - 60%, 3 - 30%, 5 - 10%
-weights = [60, 30, 10]
+weights = [100, 0, 0]
 
 # Create the following dimensions
 T = ds.createDimension('time', Number_Of_Ticks)
