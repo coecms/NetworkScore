@@ -30,6 +30,15 @@ from datetime import datetime
 from numpy import arange
 from scipy.optimize import curve_fit
 
+# Varibales for Xarray data:
+# Number of Timesteps:
+Number_Of_Ticks = 3000
+# Event severity:
+event_lev = [1, 3, 5]
+# Weights for each Event severity level:
+# 1 - 60%, 3 - 30%, 5 - 10%
+weights = [1.0, 0.0, 0.0]
+
 config 			= None
 
 imagefileindex  = 0
@@ -518,23 +527,73 @@ def create_timestep_graph():
 	global timestep_graph
 	timestep_graph = network_graph.copy()
 
+def create_xarray_data():
+	# Create the following dimensions
+	T = np.arange(1, Number_Of_Ticks + 1)
+	lat = np.arange(0, 100, 1.0)
+	lon = np.arange(0, 100, 1.0)
+
+	events_units = 'Scaler'
+	lats_units = 'Degrees'
+	lons_units = 'Degrees'
+	Ts_units = 'Days'
+
+	# Matrix of zeros to match lat,lon grid
+	# Using this matrix to store the event severity levels
+	Z = np.zeros((Number_Of_Ticks, len(lat), len(lon)))
+	Y = np.zeros((100, 100))
+
+	print(f'Creating Xarray event data for {Number_Of_Ticks} timesteps/events with a {len(lat)} x {len(lon)} grid.')
+
+	# Iterates over the timesteps
+	for i in range(Number_Of_Ticks):
+		# Matrix of zeros to match lat,lon grid
+		X = np.zeros((100, 100))
+
+		# Generate random coordinates equal to the timestep number
+		coordinates = np.random.randint(0, 100, (i + 1 , 2))
+		# Set these coordinates to be 1
+		X[coordinates[:, 0], coordinates[:, 1]] = 1
+		# Set the coordinates to be 1,3,5
+		Y[coordinates[:, 0], coordinates[:, 1]] = random.choices(event_lev, weights=weights)[0]
+
+		# Find all the coordinates of the non-zero values in the Y matrix
+		non_zero_indices = np.nonzero(Y)
+		# Set these coordinates in X to be 1
+		X[non_zero_indices] = 1
+		# Reduce the non-zero values by 1 each timestep
+		Y[non_zero_indices] = Y[non_zero_indices] - 1
+
+		# Save the values in the Z matrix
+		Z[i, :, :] = X
+
+	# Create an xarray dataset
+	ds = xr.Dataset(
+		{
+			'events': (('time', 'lat', 'lon'), Z),
+		},
+		coords={
+			'time': T,
+			'lat': lat,
+			'lon': lon,
+		},
+	)
+
+	# Add attributes to variables
+	ds['events'].attrs['units'] = events_units
+	ds['lat'].attrs['units'] = lats_units
+	ds['lon'].attrs['units'] = lons_units
+	ds['time'].attrs['units'] = Ts_units
+
+	print('Done...')
+
+	return ds
+
 def process_events_netcdf():
 	global time
 	global timestepevents
 
-	if config['netcdf'] is None:
-		error('netCDF file location not provided')
-		print('Please provide netCDF file location with --netcdf parameter')
-		exit()
-
-	netcdf_filename = config['netcdf']
-
-	if not os.path.isfile(netcdf_filename):
-		error('netCDF file does not exist: ' + netcdf_filename)
-		print('netCDF file does not exist: ' + netcdf_filename)
-		exit()
-
-	ds = xr.open_dataset(netcdf_filename, engine = "netcdf4")
+	ds = create_xarray_data()
 	for time, timevariable in enumerate(ds.events):
 		if config['max_generations'] is not None and time >= config['max_generations'][0]:
 			break
