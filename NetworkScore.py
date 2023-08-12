@@ -3,8 +3,17 @@
 """
 NetworkScore.py
 
-This is a python program that builds a network (graph) of nodes on a plane and simulates events on a grid.
-The data is provided in a netCDF file.
+This is a python program that builds a network (graph) of nodes on a plane and takes as input a netCDF file of events at the grid locations.
+The edges of the graph that are in the grid locations are deleted.
+Note, in graph theory, edges are the lines that connect two nodes.
+
+There are many command line parameters, use the --help command line parameter to see a list of all of them
+The configure_args function loads a global array called config with all of the command line parameters, which is used by the functions in this script
+
+Example usage:
+./NetworkScore.py --help
+
+./NetworkScore.py 1000 1000 100 100 --web 8 9 --netcdf Event_severity.nc --max-generations 20 --save-chart --save-image --output --debug-timestep 1 --score-nodes "54,28,51"
 
 Installation notes:
 
@@ -30,7 +39,7 @@ from datetime import datetime
 from numpy import arange
 from scipy.optimize import curve_fit
 
-# Varibales for Xarray data:
+# Variables for Xarray data:
 # Number of Timesteps:
 Number_Of_Ticks = 3000
 # Event severity:
@@ -53,13 +62,19 @@ rounding_decimal_places = 6
 # timestep, timestepevents, score
 data = {}
 
+# the network_graph is the original graph structure, before any events have occured
 network_graph = nx.MultiGraph()
+
+# the timestep_graph is the current state of the graph for the current timestep (edges may have been removed due to events)
 timestep_graph = nx.MultiGraph()
+
 fig = None
 ax = None
 
+# nodeids are integers, the center nodeid is 0
 centernodeid = 0
 
+# add a new node to the network_graph
 def new_node(nodeid, x, y):
 	col = x // config['grid_tile_width']
 	row = y // config['grid_tile_height']
@@ -74,14 +89,18 @@ def new_node(nodeid, x, y):
 
 	network_graph.add_node(nodeid, x=x, y=y, row=row, col=col, id=nodeid, color=color, size=config['node_size'], label=nodeid)
 
+# create a new edge between nodes
 def new_edge(nodeid1, nodeid2):
 	tiles = edge_tiles(nodeid1, nodeid2)
 	network_graph.add_edge(nodeid1, nodeid2, "Edge_" + str(nodeid1) + "_" + str(nodeid2), color=config['edge_color'], width=config['edge_width'], tiles=tiles)
 
+# create a new edge between nodes
 def debug_nodes(graph):
 	nodes = ' '.join(map(str, graph.nodes()))
 	debug(nodes)
 
+# determine which grid squares an edge between two nodes will pass through,
+# used to remove the edge when an event occurs on that grid square
 def edge_tiles(nodeid1, nodeid2):
 	global time
 
@@ -170,6 +189,7 @@ def edge_tiles(nodeid1, nodeid2):
 
 	return tiles
 
+# used by the edge_tiles function, to determine the next square that the edge passes through
 def	line_next_tile_col_row(col, row, x1, y1, x2, y2, toporbottom, rightorleft):
 	debug('(col, row): (' + str(col) + ',' + str(row) + ') (x1,y1): (' + str(x1) + ',' + str(y1) + ') (x2,y2): (' + str(x2) + ',' + str(y2) + ') ' + toporbottom + ' ' + rightorleft)
 
@@ -292,7 +312,7 @@ def delete_edges_at_tile(row, col):
 		debug('delete edge at tile (' + str(col) + ',' + str(row) + '): nodeid1: ' + str(nodeid1) + ' nodeid2: ' + str(nodeid2))
 		timestep_graph.remove_edge(nodeid1, nodeid2)
 
-
+# delete node at grid square row, col
 def delete_node_at_tile(row, col):
 	global timestep_graph
 
@@ -310,6 +330,7 @@ def delete_node_at_tile(row, col):
 	if len(nodestodelete) > 0:
 		debug_nodes(timestep_graph)
 
+# place an image at a grid square
 def place_image_at_tile(row, col):
 	if config['save_images']:
 		img = mpimg.imread(config['eventicon_filename'])
@@ -319,9 +340,11 @@ def place_image_at_tile(row, col):
 		ax.imshow(img, extent=(x, x + config['grid_tile_width'], y, y + config['grid_tile_height']))
 		draw_text(x + config['grid_tile_width'] / 2 - 20, y + config['grid_tile_height'] / 2 + 10, s, color='yellow')
 
+# write string s text at x, y position
 def draw_text(x, y, s, **fontdict):
 	plt.text(x, y, s, fontdict)
 
+# prepare matplotlib plot of graph
 def prepare_plot():
 	global fig, ax
 
@@ -354,6 +377,7 @@ def prepare_plot():
 
 	fig.set_facecolor(config['background_color'])
 
+# clear plot
 def clear_plot():
 #	plt.clf()
 #	matplotlib.pyplot.close()
@@ -361,11 +385,12 @@ def clear_plot():
 	plt.close()
 #	plt.clf()
 
-
+# used to determine line of best fit
 # define the true objective function
 def objective(x, a = 0, b = 0, c = 0, d = 0, e = 0, f = 0):
 	return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + f
 
+# plot chart, this is a chart of the score of the graph for each timestep, and a line of best fit
 def plot_chart():
 	global scoremax
 	scale = 1
@@ -400,7 +425,7 @@ def plot_chart():
 	plt.grid()
 #	plt.show()
 
-
+# plot graph
 def plot_graph():
 	global timestep_graph
 	global timestepevents
@@ -412,6 +437,7 @@ def plot_graph():
 	edge_colors		= []
 	widths			= []
 
+	# plot nodes
 	for node in timestep_graph.nodes.items():
 		nodedata = node[1]
 		pos[nodedata['id']] 	= [nodedata['x'], nodedata['y']]
@@ -420,6 +446,7 @@ def plot_graph():
 		sizes.append(nodedata['size'])
 		draw_text(nodedata['x'] - 15, nodedata['y'] - config['node_size'], str(nodedata['col']) + ',' + str(nodedata['row']), color='white')
 
+	# plot edges
 	for edge in timestep_graph.edges.items():
 		edgedata = edge[1]
 		edge_colors.append(edgedata['color'])
@@ -438,6 +465,8 @@ def plot_graph():
 
 	nx.draw_networkx(timestep_graph, pos, labels=labels, node_color=colors, node_size=sizes, edge_color=edge_colors, font_size=config['font_size'], font_color=config['font_color'], width=widths)
 
+# build the graph based on configuration parameters
+# currently only the web type of network is supported
 def build_graph():
 	if len(config['web']) == 2:
 		config['web_rings'] 	= config['web'][0]
@@ -487,7 +516,7 @@ def build_graph():
 		debug("Web radials: " + str(config['web_radials']))
 		debug("Node count: " + str(len(network_graph.nodes())))
 
-
+# output a image of the graph to a file
 def save_plot_image():
 	global timestep_graph
 	global output_directory
@@ -499,6 +528,7 @@ def save_plot_image():
 	debug('Saved image: ' + filename)
 	imagefileindex += 1
 
+# output a image of the chart to a file
 def save_chart_image():
 	global output_directory
 
@@ -510,6 +540,7 @@ def save_chart_image():
 	plt.savefig(filename, dpi=config['dpi'])
 	debug('Saved image: ' + filename)
 
+# calculate score for the network
 def calculate_score():
 	global timestamp_graph
 	global data
@@ -523,10 +554,12 @@ def calculate_score():
 
 	scoremax = max(scoremax, data[time]['score'])
 
+# create a graph based on the network_graph for this timestep
 def create_timestep_graph():
 	global timestep_graph
 	timestep_graph = network_graph.copy()
 
+# used by the edge_tiles function, to determine the next square that the edge passes through
 def create_xarray_data():
 	# Create the following dimensions
 	T = np.arange(1, Number_Of_Ticks + 1)
@@ -588,12 +621,14 @@ def create_xarray_data():
 	print('Done...')
 
 	return ds
-
+# process the events netcdf file
 def process_events_netcdf():
 	global time
 	global timestepevents
 
 	ds = create_xarray_data()
+
+	# loop through events
 	for time, timevariable in enumerate(ds.events):
 		if config['max_generations'] is not None and time >= config['max_generations'][0]:
 			break
@@ -631,7 +666,7 @@ def process_events_netcdf():
 		if config['max_generations'] is not None and time >= config['max_generations'][0]:
 			break
 
-
+# generate video of the graph images using ffmpeg
 def video():
 	global output_directory
 	global time
@@ -650,6 +685,7 @@ def video():
 	debug(command)
 	os.system(command)
 
+# create output directory
 def create_output_directory():
 	global timestamp
 	global output_directory
@@ -662,6 +698,7 @@ def create_output_directory():
 	if not os.path.isdir(output_directory):
 		os.makedirs(output_directory)
 
+# log message with severity
 def log(severity, message):
 	global output_directory
 
@@ -676,26 +713,32 @@ def log(severity, message):
 	if config['debug']:
 		print(line, end="")
 
+# log trace message to output
 def trace(message):
 	if config['trace']:
 		log('TRACE', message)
 
+# log debug message to output
 def debug(message):
 	if config['debug']:
 		log('DEBUG', message)
 
+# log info message to output
 def info(message):
 	if config['info']:
 		log('INFO ', message)
 
+# log warning message to output
 def warn(message):
 	if config['warn']:
 		log('WARN ', message)
 
+# log error message to output
 def error(message):
 	if config['error']:
 		log('ERROR', message)
 
+# load values into the global config array, based on command line parameters
 def configure_args():
 	global config
 
@@ -753,6 +796,7 @@ def configure_args():
 	config['grid_tile_width'] 	= config['map_width'] // config['grid_cols']
 	config['score_nodes'] 		= list(map(int, config['score_nodes'][0].split(',')))
 
+# output data to the output csv file
 def output_csv():
 	global output_directory
 	global data
@@ -770,10 +814,12 @@ def output_csv():
 
 	if config['debug']:
 		debug(str([[value for value in row.values()] for row in data.values()]))
-		
+
+# main function		
 def main():
 	global timestamp
 
+	# note: timestamp variable is used for the name of the output directory, not to be confused with the timestep variable which is used during the processing of events in each timestep
 	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 	configure_args()
