@@ -130,7 +130,7 @@ def edge_tiles(nodeid1, nodeid2):
 	row1, row2 = y1 // config['grid_tile_height'], y2 // config['grid_tile_height']
 
 	# Debug information about the nodes and their coordinates
-	debug('node1: ' + str(nodeid1) + ' (' + str(col1) + ',' + str(row1)) + ' (' + str()')
+	debug('node1: ' + str(nodeid1) + ' (' + str(col1) + ',' + str(row1) + ')')
 	debug('node2: ' + str(nodeid2) + ' (' + str(col2) + ',' + str(row2) + ')')
 
 	# Initialize the tiles list with the tile of the first node
