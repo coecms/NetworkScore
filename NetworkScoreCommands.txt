@@ -1,15 +1,8 @@
 usage: NetworkScore.py [-h] [-W RADIALS RINGS] [-R NODES EDGES]
-                       [-NC NODE_COLOR] [-NS NODE_SIZE] [-EC EDGE_COLOR]
-                       [-EW EDGE_WIDTH] [-FC FONT_COLOR] [-FS FONT_SIZE]
-                       [-BC BACKGROUND_COLOR] [-SG] [-GC GRID_COLOR] [-SS]
-                       [-EIF EVENT_ICON_FILENAME] [-SI] [-FP FILEPATH]
-                       [-FN FILENAME] [-DPI DPI] [-MG GENERATION_COUNT]
+                       [-NC NODE_COLOR] [-NS NODE_SIZE] [-MG GENERATION_COUNT]
                        [-V [FILENAME]] [-VL [SECONDS]] [-O [FILENAME]]
                        [-OD [DIRNAME]] [-ONS] [-DT [TIMESTEPS]] [-TL] [-DL]
-                       [-IL] [-WL] [-EL] [-LF FILENAME] [-CDF [FILENAME]]
-                       [-SC] [-CSS CHART_SCREEN_SECONDS] [-CFN FILENAME]
-                       [-CLX CHART_LABEL_X] [-CLY CHART_LABEL_Y]
-                       [-CT CHART_TITLE]
+                       [-IL] [-WL] [-EL] [-LF FILENAME] [-CDF [FILENAME]
                        map_height map_width grid_rows grid_cols
 
 NetworkScore
@@ -26,33 +19,6 @@ options:
                         web RADIALS RINGS (default: None)
   -R NODES EDGES, --random NODES EDGES
                         random NODES EDGES (default: None)
-  -NC NODE_COLOR, --node-color NODE_COLOR
-                        node color (default: blue)
-  -NS NODE_SIZE, --node-size NODE_SIZE
-                        node size (default: 30)
-  -EC EDGE_COLOR, --edge-color EDGE_COLOR
-                        edge color (default: blue)
-  -EW EDGE_WIDTH, --edge-width EDGE_WIDTH
-                        edge width (default: 1.5)
-  -FC FONT_COLOR, --font-color FONT_COLOR
-                        font color (default: white)
-  -FS FONT_SIZE, --font-size FONT_SIZE
-                        font size (default: 5)
-  -BC BACKGROUND_COLOR, --background-color BACKGROUND_COLOR
-                        background color (default: black)
-  -SG, --show-grid      show grid (default: False)
-  -GC GRID_COLOR, --grid-color GRID_COLOR
-                        grid color (default: darkred)
-  -SS, --show-statistics
-                        show statistics (default: False)
-  -EIF EVENT_ICON_FILENAME, --eventicon-filename EVENT_ICON_FILENAME
-                        event icon filename (default: event.png)
-  -SI, --save-images    save images (default: False)
-  -FP FILEPATH, --filepath FILEPATH
-                        filepath (default: ./)
-  -FN FILENAME, --filename FILENAME
-                        filename (default: image)
-  -DPI DPI, --dpi DPI   DPI (default: 300)
   -MG GENERATION_COUNT, --max-generations GENERATION_COUNT
                         max generations GENERATION_COUNT (default: None)
   -V [FILENAME], --video [FILENAME]
@@ -76,15 +42,3 @@ options:
                         log file FILENAME (default: output.log)
   -CDF [FILENAME], --netcdf [FILENAME]
                         netCDF FILENAME (default: None)
-  -SC, --save-chart     save chart (default: False)
-  -CSS CHART_SCREEN_SECONDS, --chart-screen-seconds CHART_SCREEN_SECONDS
-                        chart screen seconds (default: 1)
-  -CFN FILENAME, --chart-filename FILENAME
-                        chart filename FILENAME (default: chart.png)
-  -CLX CHART_LABEL_X, --chart-label-x CHART_LABEL_X
-                        chart label x LABEL (default: Events per timestep)
-  -CLY CHART_LABEL_Y, --chart-label-y CHART_LABEL_Y
-                        chart label y LABEL (default: Network efficiency)
-  -CT CHART_TITLE, --chart-title CHART_TITLE
-                        chart title TITLE (default: Network efficiency vs
-                        Events per timestep)
