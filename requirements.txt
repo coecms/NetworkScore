@@ -3,5 +3,3 @@ networkx
 xarray
 numpy
 argparse
-math
-datetime
