@@ -1,6 +1,6 @@
 # NetworkScore
 
-The paper associated with this code has been accpeted for publication and the DOI will be placed here upon publication.
+Paper: [![DOI](https://zenodo.org/badge/531778489.svg)](https://iopscience.iop.org/article/10.1088/1748-9326/ad4377)
 
 Code: [![DOI](https://zenodo.org/badge/531778489.svg)](https://zenodo.org/doi/10.5281/zenodo.11139593)
 
@@ -28,3 +28,11 @@ python NetworkScore.py --help
 ## Installation notes:
 
 See the requirements.txt file for required python libraries.
+
+## Citations:
+
+Please cite the paper and code with:
+
+Pitman, Andy & Saribatir, Ed & Greenhill, Catherine & Green, Samuel & Pitman, Samuel & Fiedler, Tanya. (2024). Linking physical climate risk with mandatory business risk disclosure requirements. Environmental Research Letters. 10.1088/1748-9326/ad4377. 
+
+Pitman, A., Saribatir, E., Greenhill, C., Green, S., Pitman, S., & Fiedler, T. (2024). Network Score (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.11139594
