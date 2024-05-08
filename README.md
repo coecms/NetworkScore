@@ -15,7 +15,4 @@ python NetworkScore.py --help
 ```
 ## Installation notes:
 
-```bash
-pip install networkx
-pip install xarray
-```
+See the requirements.txt file for required python libraries.
