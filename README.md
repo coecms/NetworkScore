@@ -1,6 +1,6 @@
 # NetworkScore
 
-Paper: [![DOI](https://zenodo.org/badge/531778489.svg)](https://iopscience.iop.org/article/10.1088/1748-9326/ad4377)
+Paper: https://iopscience.iop.org/article/10.1088/1748-9326/ad4377
 
 Code: [![DOI](https://zenodo.org/badge/531778489.svg)](https://zenodo.org/doi/10.5281/zenodo.11139593)
 
