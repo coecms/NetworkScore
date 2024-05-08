@@ -2,6 +2,8 @@
 
 The paper associated with this code has been accpeted for publication and the DOI will be placed here upon publication.
 
+Code: [![DOI](https://zenodo.org/badge/531778489.svg)](https://zenodo.org/doi/10.5281/zenodo.11139593)
+
 This python program builds a spider web graph using the ```Networkx``` library, based on the Aoyanagi and Okumura (2010) model. This web is defined by ```n``` radials and ```m``` rings that form concentric circles. Each point of intersection of radial lines and rings is a node of the web. You select three target nodes to be the basis of the network efficiency. 
 
 Superimposed over the spider’s web is a grid. We use a 100 by 100 grid but any grid dimension is available. Some individual grid boxes (cells) do not intersect with the spider’s web (e.g. at the
